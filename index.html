@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-t="pageTitle">Laufbursche STREETBOOSTER Tool</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="stylesheet" href="styles.css?v=7">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Laufbursche <span data-t="brandSub"></span></h1>
+    <div class="head-right">
+      <span class="status" id="status" data-state="disconnected">disconnected</span>
+      <div class="head-tools">
+        <button type="button" class="theme-btn" id="btn-theme">&#9728;</button>
+        <div class="langs" id="langs" role="group">
+          <button type="button" data-lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <p class="hint infobox" data-t="infoBannerHtml"></p>
+
+  <div class="card">
+    <h2 data-t="s1Title"></h2>
+    <p class="hint" data-t="sub"></p>
+    <p class="hint" data-t="startHintGuide"></p>
+    <p class="warn" data-t="expWarn"></p>
+    <p class="hint" data-t="ownDevice"></p>
+  </div>
+
+  <div class="card">
+    <h2 data-t="s2Title"></h2>
+    <div class="log-opt">
+      <span data-t="showallLabel"></span>
+      <input type="checkbox" id="showall">
+    </div>
+    <div class="btns">
+      <button class="primary span2" id="btn-conn" data-act="connect"></button>
+    </div>
+    <p class="hint" id="devinfo"></p>
+    <p class="hint" data-t="controlsHint"></p>
+  </div>
+
+  <div class="card" id="live-card" hidden>
+    <div class="card-head"><h2 data-t="liveTitle"></h2><button type="button" class="help-btn" data-help="live" aria-label="Info">?</button></div>
+    <div class="grid">
+      <div class="tile"><b id="t-speedlimit">-</b><small data-t="tileSpeedLimit"></small></div>
+      <div class="tile"><b id="t-speed">-</b><small data-t="tileSpeed"></small></div>
+      <div class="tile"><b id="t-gear">-</b><small data-t="tileGear"></small></div>
+      <div class="tile"><b id="t-current">-</b><small data-t="tileCurrent"></small></div>
+      <div class="tile"><b id="t-power">-</b><small data-t="tilePower"></small></div>
+      <div class="tile"><b id="t-esctemp">-</b><small data-t="tileEscTemp"></small></div>
+      <div class="tile"><b id="t-motortemp">-</b><small data-t="tileMotorTemp"></small></div>
+      <div class="tile"><b id="t-trip">-</b><small data-t="tileTrip"></small></div>
+      <div class="tile"><b id="t-odo">-</b><small data-t="tileOdo"></small></div>
+      <div class="tile"><b id="t-fault">-</b><small data-t="tileFault"></small></div>
+      <div class="tile"><b id="t-lock">-</b><small data-t="tileLock"></small></div>
+      <div class="tile"><b id="t-light">-</b><small data-t="tileLight"></small></div>
+      <div class="tile"><b id="t-cruise">-</b><small data-t="tileCruise"></small></div>
+      <div class="tile"><b id="t-unit">-</b><small data-t="tileUnit"></small></div>
+      <div class="tile"><b id="t-boot">-</b><small data-t="tileBoot"></small></div>
+      <div class="tile"><b id="t-atmo">-</b><small data-t="tileAtmo"></small></div>
+    </div>
+    <p class="hint" data-t="liveHint"></p>
+  </div>
+
+  <div class="card" id="batt-card" hidden>
+    <div class="card-head"><h2 data-t="battTitle"></h2><button type="button" class="help-btn" data-help="batt" aria-label="Info">?</button></div>
+    <div class="grid">
+      <div class="tile"><b id="t-batt">-</b><small data-t="tileBatt"></small></div>
+      <div class="tile"><b id="t-volt">-</b><small data-t="tileVolt"></small></div>
+    </div>
+    <p class="hint" data-t="battHint"></p>
+  </div>
+
+  <div class="card" id="more-card" hidden>
+    <div class="card-head"><h2 data-t="moreTitle"></h2><button type="button" class="help-btn" data-help="more" aria-label="Info">?</button></div>
+    <p class="hint" data-t="moreHint"></p>
+
+    <h3 class="set-group" data-t="setgrpSpeed"></h3>
+    <div class="btns">
+      <button class="primary span2" id="btn-toggle" data-conn disabled></button>
+    </div>
+    <div class="two">
+      <div class="fld"><label data-t="lblOpen"></label><input id="open-in" type="number" step="1" min="1" max="60" value="30"></div>
+      <div class="fld"><label data-t="lblEkfv"></label><input id="ekfv-in" type="number" step="1" min="1" max="60" value="20"></div>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="lblSetExact"></span></label>
+      <input id="speed-in" type="number" step="1" min="1" max="60" value="20">
+      <button id="btn-setspeed" data-t="btnSetExact" data-conn disabled></button>
+    </div>
+    <p class="hint" id="speed-current"></p>
+    <p class="hint" data-t="speedHint"></p>
+
+    <h3 class="set-group" data-t="setgrpGeneral"></h3>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_light"></span></label>
+      <select id="set-light" data-conn disabled><option value="0" data-t="valOff"></option><option value="1" data-t="valOn"></option></select>
+      <button type="button" id="btn-set-light" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_atmo"></span></label>
+      <select id="set-atmo" data-conn disabled><option value="0" data-t="valOff"></option><option value="1" data-t="valOn"></option></select>
+      <button type="button" id="btn-set-atmo" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_unit"></span></label>
+      <select id="set-unit" data-conn disabled><option value="0" data-t="optKm"></option><option value="1" data-t="optMi"></option></select>
+      <button type="button" id="btn-set-unit" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_throttleAccel"></span></label>
+      <input id="set-throttle-accel" type="number" min="0" max="10" step="1" data-conn disabled>
+      <button type="button" id="btn-set-throttle-accel" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_throttleBrake"></span></label>
+      <input id="set-throttle-brake" type="number" min="0" max="10" step="1" data-conn disabled>
+      <button type="button" id="btn-set-throttle-brake" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_cruise"></span></label>
+      <select id="set-cruise" data-conn disabled><option value="0" data-t="valOff"></option><option value="1" data-t="valOn"></option></select>
+      <button type="button" id="btn-set-cruise" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_cruiseTime"></span></label>
+      <input id="set-cruise-time" type="number" min="2" max="30" step="1" data-conn disabled>
+      <button type="button" id="btn-set-cruise-time" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_boot"></span></label>
+      <select id="set-boot" data-conn disabled><option value="0" data-t="bootKick"></option><option value="1" data-t="bootZero"></option></select>
+      <button type="button" id="btn-set-boot" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_lock"></span></label>
+      <select id="set-lock" data-conn disabled><option value="0" data-t="valOpen"></option><option value="1" data-t="valLocked"></option></select>
+      <button type="button" id="btn-set-lock" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_autoOff"></span></label>
+      <input id="set-auto-off" type="number" min="2" max="30" step="1" data-conn disabled>
+      <button type="button" id="btn-set-auto-off" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_serviceKm"></span></label>
+      <input id="set-service-km" type="number" min="0" max="60000" step="50" data-conn disabled>
+      <button type="button" id="btn-set-service-km" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_maxMod"></span></label>
+      <input id="set-max-mod" type="number" min="1" max="50" step="1" data-conn disabled>
+      <button type="button" id="btn-set-max-mod" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_motorPoles"></span></label>
+      <input id="set-motor-poles" type="number" min="1" max="30" step="1" data-conn disabled>
+      <button type="button" id="btn-set-motor-poles" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_maxDischarge"></span></label>
+      <input id="set-max-discharge" type="number" min="0.5" max="20" step="0.5" data-conn disabled>
+      <button type="button" id="btn-set-max-discharge" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_maxBrake"></span></label>
+      <input id="set-max-brake" type="number" min="0.5" max="30" step="0.5" data-conn disabled>
+      <button type="button" id="btn-set-max-brake" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_lowVolt"></span></label>
+      <input id="set-low-volt" type="number" min="18" max="44" step="0.5" data-conn disabled>
+      <button type="button" id="btn-set-low-volt" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_wheel"></span></label>
+      <input id="set-wheel" type="number" min="0.5" max="15" step="0.5" data-conn disabled>
+      <button type="button" id="btn-set-wheel" data-t="btnSend" data-conn disabled></button>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="set_carrier"></span></label>
+      <select id="set-carrier" data-conn disabled><option value="0">8 kHz</option><option value="1">10 kHz</option><option value="2">12 kHz</option><option value="3">15 kHz</option><option value="4" data-t="optAuto"></option></select>
+      <button type="button" id="btn-set-carrier" data-t="btnSend" data-conn disabled></button>
+    </div>
+  </div>
+
+  <div class="card" id="raw-card" hidden>
+    <div class="card-head"><h2 data-t="rawTitle"></h2><button type="button" class="help-btn" data-help="raw" aria-label="Info">?</button></div>
+    <p class="warn" data-t="rawHint"></p>
+
+    <h3 class="set-group" data-t="grp_reg"></h3>
+    <div class="two">
+      <div class="fld"><label data-t="lblRegAddr"></label><input id="free-op" type="text" maxlength="4" data-t-ph="regAddrPh" data-conn disabled></div>
+      <div class="fld"><label data-t="lblRegVal"></label><input id="free-payload" type="text" data-t-ph="regValPh" data-conn disabled></div>
+    </div>
+    <div class="btns">
+      <button type="button" id="btn-regread" data-t="btnRegRead" data-conn disabled></button>
+      <button type="button" id="btn-regwrite" data-t="btnRegWrite" data-conn disabled></button>
+    </div>
+
+    <h3 class="set-group" data-t="grp_raw"></h3>
+    <div class="set-row">
+      <label class="set-label"><span data-t="lblRaw"></span></label>
+      <input id="raw-in" type="text" data-t-ph="rawPh" data-conn disabled>
+      <button type="button" id="btn-raw" data-t="btnRaw" data-conn disabled></button>
+    </div>
+
+    <h3 class="set-group" data-t="grp_build"></h3>
+    <div class="two">
+      <div class="fld"><label data-t="lblBuildHead"></label><input id="build-head" type="text" maxlength="2" data-t-ph="buildHeadPh" value="01" data-conn disabled></div>
+      <div class="fld"><label data-t="lblBuildPayload"></label><input id="build-payload" type="text" data-t-ph="buildPayloadPh" data-conn disabled></div>
+    </div>
+    <div class="set-row">
+      <label class="set-label"><span data-t="lblBuildOut"></span></label>
+      <input id="build-out" type="text" readonly>
+      <button type="button" id="btn-build" data-t="btnBuild" data-conn disabled></button>
+    </div>
+    <div class="btns">
+      <button type="button" id="btn-build-send" class="primary span2" data-t="btnBuildSend" data-conn disabled></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-t="s6Title"></h2>
+    <div class="log-opts">
+      <div class="log-opt">
+        <span data-t="publicLogLabel"></span>
+        <input type="checkbox" id="public-log" checked>
+        <button type="button" class="help-btn" data-help="publiclog" aria-label="Info">?</button>
+      </div>
+      <div class="log-opt">
+        <span data-t="diagLogLabel"></span>
+        <input type="checkbox" id="diag-log">
+        <button type="button" class="help-btn" data-help="diaglog" aria-label="Info">?</button>
+      </div>
+    </div>
+    <div class="btns">
+      <button type="button" id="btn-copy-log" data-t="btnCopyLog"></button>
+      <button type="button" id="btn-clear-log" data-t="btnClearLog"></button>
+      <button type="button" id="btn-save-log" class="span2" data-t="btnSaveLog"></button>
+    </div>
+    <pre id="log"></pre>
+    <p class="hint"><span class="log-tx" data-t="logTxLegend"></span>, <span class="log-rx" data-t="logRxLegend"></span></p>
+  </div>
+
+  <footer class="foot">
+    <span class="foot-links">
+      <a id="link-guide" href="GUIDE.de.md" data-doc="GUIDE" data-t="footGuide"></a>
+      <a href="https://github.com/Laufbursche42/streetbooster-unlock" target="_blank" rel="noopener" data-t="footSource"></a>
+      <a id="link-readme" href="README.md" data-doc="README" data-t="footReadme"></a>
+      <a id="link-disclaimer" href="#" data-t="footDisclaimer"></a>
+      <a id="link-license" href="LICENSE.de.md" data-doc="LICENSE" data-t="footLicense"></a>
+      <a id="link-privacy" href="PRIVACY.de.md" data-doc="PRIVACY" data-t="footPrivacy"></a>
+      <a id="link-trademarks" href="TRADEMARKS.de.md" data-doc="TRADEMARKS" data-t="footTrademarks"></a>
+    </span>
+    <span class="ver" id="build-ver"></span>
+    <a class="foot-copy" href="https://laufbursche42.github.io/Laufbursche42/" target="_blank" rel="noopener">Copyright (c) 2026 Laufbursche</a>
+  </footer>
+</div>
+
+<dialog id="doc" aria-labelledby="doc-title">
+  <div class="doc-head">
+    <h3 id="doc-title"></h3>
+    <button type="button" id="doc-x">&times;</button>
+  </div>
+  <div class="doc-body" id="doc-body"></div>
+  <div class="doc-foot">
+    <button type="button" id="doc-close" data-t="docClose"></button>
+  </div>
+</dialog>
+
+<dialog id="help" aria-labelledby="help-title">
+  <div class="doc-head">
+    <h3 id="help-title"></h3>
+    <button type="button" id="help-x">&times;</button>
+  </div>
+  <div class="doc-body"><p id="help-body"></p></div>
+  <div class="doc-foot">
+    <button type="button" id="help-close" data-t="docClose"></button>
+  </div>
+</dialog>
+
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <div class="doc-head">
+    <h3 id="confirm-title" data-t="confirmTitle"></h3>
+    <button type="button" id="confirm-x">&times;</button>
+  </div>
+  <div class="doc-body"><p id="confirm-body"></p></div>
+  <div class="doc-foot">
+    <button type="button" id="confirm-no" data-t="confirmCancel"></button>
+    <button type="button" id="confirm-ok" class="primary" data-t="confirmOk"></button>
+  </div>
+</dialog>
+
+<script src="i18n.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
