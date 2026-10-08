@@ -134,6 +134,7 @@ window.I18N = {
 
     footGuide: 'Anleitung',
     footSource: 'Quellcode',
+    footIssue: 'Fehler melden',
     footReadme: 'Readme',
     footDisclaimer: 'Haftungsausschluss',
     footLicense: 'Lizenz',
@@ -311,6 +312,7 @@ window.I18N = {
 
     footGuide: 'Guide',
     footSource: 'Source',
+    footIssue: 'Report an issue',
     footReadme: 'Readme',
     footDisclaimer: 'Disclaimer',
     footLicense: 'License',
