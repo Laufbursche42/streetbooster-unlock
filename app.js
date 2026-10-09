@@ -13,7 +13,7 @@
  */
 
 // Pre-commit cache-buster auto-bumps BUILD and every ?v= on any web-asset change.
-const BUILD = 'v5';
+const BUILD = 'v6';
 
 // =========================================================================================
 //  VERIFIED PROTOCOL CORE (code-proven from com.zydtech.library.core.BleCore; self-test below runs at load)
@@ -588,28 +588,75 @@ function confirmRisky(msg) {
 
 // --------------------------- doc viewer (markdown of our own docs) ---------------------------
 const DOC_TITLES = { 'GUIDE.de.md': 'footGuide', 'GUIDE.en.md': 'footGuide', 'README.md': 'footReadme', 'LICENSE.de.md': 'footLicense', 'LICENSE.md': 'footLicense', 'PRIVACY.de.md': 'footPrivacy', 'PRIVACY.md': 'footPrivacy', 'TRADEMARKS.de.md': 'footTrademarks', 'TRADEMARKS.md': 'footTrademarks', 'DISCLAIMER.de.md': 'footDisclaimer', 'DISCLAIMER.md': 'footDisclaimer' };
-const escHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+const escHtml = esc;
 const slug = s => s.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
 function docFile(name) { if (name === 'README') return 'README.md'; if (name === 'GUIDE') return 'GUIDE.' + lang + '.md'; return name + (lang === 'de' ? '.de.md' : '.md'); }
-function mdToHtml(src) {
-  const inline = s => escHtml(s)
+// inlineMd receives ALREADY-escaped text (mdToHtml escapes first); DOC_TITLES hrefs stay in-modal.
+function inlineMd(s) {
+  return s
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (all, text, href) => DOC_TITLES[href] ? '<a href="' + href + '" data-docfile="' + href + '">' + text + '</a>' : '<a href="' + href + '" target="_blank" rel="noopener">' + text + '</a>');
-  const lines = String(src).split(/\r?\n/); let html = '', inList = false, inCode = false;
-  for (const ln of lines) {
-    if (/^```/.test(ln)) { if (inCode) { html += '</pre>'; inCode = false; } else { if (inList) { html += '</ul>'; inList = false; } html += '<pre class="doc-code">'; inCode = true; } continue; }
-    if (inCode) { html += escHtml(ln) + '\n'; continue; }
-    const h = ln.match(/^(#{1,4})\s+(.*)$/);
-    if (h) { if (inList) { html += '</ul>'; inList = false; } const lvl = h[1].length + 1; html += '<h' + lvl + ' id="' + slug(h[2]) + '">' + inline(h[2]) + '</h' + lvl + '>'; continue; }
-    const li = ln.match(/^\s*[-*]\s+(.*)$/);
-    if (li) { if (!inList) { html += '<ul>'; inList = true; } html += '<li>' + inline(li[1]) + '</li>'; continue; }
-    if (/^\s*$/.test(ln)) { if (inList) { html += '</ul>'; inList = false; } continue; }
-    if (inList) { html += '</ul>'; inList = false; }
-    html += '<p>' + inline(ln) + '</p>';
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) {
+      if (DOC_TITLES[href]) return '<a href="' + href + '" data-docfile="' + href + '">' + text + '</a>';
+      return '<a href="' + href + '" target="_blank" rel="noopener">' + text + '</a>';
+    });
+}
+function mdToHtml(md) {
+  var codeBlocks = [];
+  // 1) pull fenced code blocks out first so their content is never treated as markdown
+  md = String(md).replace(/```[^\n]*\n?([\s\S]*?)```/g, function (m, code) {
+    var i = codeBlocks.length;
+    codeBlocks.push('<pre><code>' + esc(code.replace(/\n$/, '')) + '</code></pre>');
+    return '\x00CB' + i + '\x00';
+  });
+  var lines = md.split(/\r?\n/);
+  var out = [], para = [], list = null;
+  function flushPara() { if (para.length) { out.push('<p>' + inlineMd(esc(para.join(' '))) + '</p>'); para = []; } }
+  function flushList() { if (list) { out.push('<' + list.type + '>' + list.items.join('') + '</' + list.type + '>'); list = null; } }
+  function isTableSep(s) { var tt = s.replace(/\s/g, ''); return /^\|?:?-+:?(\|:?-+:?)+\|?$/.test(tt); }
+  function splitRow(s) { return s.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function (c) { return c.trim(); }); }
+  for (var i = 0; i < lines.length; i++) {
+    var ln = lines[i];
+    var cb = ln.match(/^\x00CB(\d+)\x00$/);
+    if (cb) { flushPara(); flushList(); out.push(codeBlocks[Number(cb[1])]); continue; }
+    if (/^\s*$/.test(ln)) { flushPara(); flushList(); continue; }
+    var h = ln.match(/^(#{1,6})\s+(.*)$/);
+    if (h) { flushPara(); flushList(); var lvl = Math.min(h[1].length, 4); out.push('<h' + lvl + '>' + inlineMd(esc(h[2])) + '</h' + lvl + '>'); continue; }
+    if (/^---+$/.test(ln.trim())) { flushPara(); flushList(); out.push('<hr>'); continue; }
+    if (ln.indexOf('|') >= 0 && i + 1 < lines.length && isTableSep(lines[i + 1])) {   // GFM table: header, |---| sep, rows
+      flushPara(); flushList();
+      var head = splitRow(ln); i++;   // consume the separator row
+      var body = '';
+      while (i + 1 < lines.length && lines[i + 1].indexOf('|') >= 0 && lines[i + 1].trim() !== '') {
+        body += '<tr>' + splitRow(lines[++i]).map(function (c) { return '<td>' + inlineMd(esc(c)) + '</td>'; }).join('') + '</tr>';
+      }
+      out.push('<table><thead><tr>' + head.map(function (c) { return '<th>' + inlineMd(esc(c)) + '</th>'; }).join('') + '</tr></thead><tbody>' + body + '</tbody></table>');
+      continue;
+    }
+    if (/^\s*>/.test(ln)) {                             // merge consecutive > lines into ONE callout
+      flushPara(); flushList();
+      var q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, '')); i++; }
+      i--;                                              // step back; the for-loop re-increments
+      while (q.length && /^\s*$/.test(q[0])) q.shift();
+      while (q.length && /^\s*$/.test(q[q.length - 1])) q.pop();
+      if (q.length) out.push('<blockquote>' + mdToHtml(q.join('\n')) + '</blockquote>');  // inner rendered as markdown
+      continue;
+    }
+    var ul = ln.match(/^\s*[-*]\s+(.*)$/);
+    var ol = ln.match(/^\s*\d+\.\s+(.*)$/);
+    if (ul || ol) {
+      flushPara();
+      var type = ul ? 'ul' : 'ol';
+      if (!list || list.type !== type) { flushList(); list = { type: type, items: [] }; }
+      list.items.push('<li>' + inlineMd(esc((ul ? ul[1] : ol[1]))) + '</li>');
+      continue;
+    }
+    para.push(ln.trim());
   }
-  if (inList) html += '</ul>'; if (inCode) html += '</pre>';
-  return html;
+  flushPara(); flushList();
+  return out.join('\n');
 }
 const docCache = {};
 async function openDocFile(file) {
