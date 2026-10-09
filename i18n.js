@@ -161,8 +161,6 @@ window.I18N = {
     warnUnlock: 'Das hebt die Sperre auf.',
     warnMotor: 'Dieser Wert greift tief in Motor oder Akku ein. Ein falscher Wert kann den Controller beschädigen. Nur am eigenen Fahrzeug und nur wenn du weißt, was der Parameter tut.',
     warnRegWrite: 'Direktes Schreiben in ein Controller-Register. Falsche Adresse oder falscher Wert kann den Roller in einen unerwarteten Zustand bringen. Nur wenn du weißt, was das Register tut.',
-    disclaimerText: 'Dieses Werkzeug ist eine Machbarkeitsstudie, kein fertiges Produkt. Es gibt keine Gewährleistung und keine Zusicherung fehlerfreien Betriebs. Das Anheben der Geschwindigkeit hebt die Drossel auf: die ABE erlischt und der Betrieb auf öffentlichen Wegen ist dann nicht erlaubt. Nutze es nur am eigenen Fahrzeug und auf eigenes Risiko. Die Seite spricht nur lokal über Bluetooth mit dem Gerät, es werden keine Daten an einen Server gesendet. STREETBOOSTER ist eine Marke des jeweiligen Inhabers. Dieses Projekt ist unabhängig und steht in keiner Verbindung zu STREETBOOSTER oder ZYD Technology.',
-
     errNoWebBt: 'Dieser Browser hat kein Web Bluetooth. Nutze Chrome, Edge oder Bluefy (iOS).',
     errNotConnected: 'nicht verbunden',
     errNoBytes: 'keine gültigen Hex-Bytes',
@@ -339,8 +337,6 @@ window.I18N = {
     warnUnlock: 'This releases the lock.',
     warnMotor: 'This value reaches deep into the motor or battery. A wrong value can damage the controller. Only on your own vehicle and only if you know what the parameter does.',
     warnRegWrite: 'Direct write into a controller register. A wrong address or value can put the scooter into an unexpected state. Only if you know what the register does.',
-    disclaimerText: 'This tool is a feasibility study, not a finished product. There is no warranty and no guarantee of error-free operation. Raising the speed removes the throttle: the type approval becomes void and riding on public roads is then not allowed. Use it only on your own vehicle and at your own risk. The page talks to the device locally over Bluetooth only, no data is sent to any server. STREETBOOSTER is a trademark of its respective owner. This project is independent and not affiliated with STREETBOOSTER or ZYD Technology.',
-
     errNoWebBt: 'This browser has no Web Bluetooth. Use Chrome, Edge or Bluefy (iOS).',
     errNotConnected: 'not connected',
     errNoBytes: 'no valid hex bytes',
